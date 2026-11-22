@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Radar — pre-token protocols ranked by implied value</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <span class="mark" aria-hidden="true">&#9679;</span>
+    <div>
+      <h1>Token Radar</h1>
+      <p class="sub">Every pre-token protocol in the snapshot, ranked by what its token would be worth</p>
+    </div>
+  </div>
+  <div class="meta" id="meta"></div>
+</header>
+
+<main>
+  <section class="panel model-note" id="model-note"></section>
+
+  <section class="panel controls" aria-label="Board controls">
+    <label class="ctl search">
+      <span>Search</span>
+      <input id="q" type="search" placeholder="Name or slug…" autocomplete="off">
+    </label>
+    <label class="ctl">
+      <span>Category</span>
+      <select id="category"></select>
+    </label>
+    <div class="ctl">
+      <span>Scope</span>
+      <div class="seg" id="scope" role="group" aria-label="Scope">
+        <button type="button" data-scope="all" class="on">All ranked</button>
+        <button type="button" data-scope="watchlist">Watchlist</button>
+        <button type="button" data-scope="early">Early finds</button>
+      </div>
+    </div>
+    <label class="ctl">
+      <span>Sort by</span>
+      <select id="sort">
+        <option value="implied">Implied value</option>
+        <option value="tvl">TVL</option>
+        <option value="growth">7-day growth</option>
+        <option value="age">Age</option>
+      </select>
+    </label>
+    <label class="ctl">
+      <span>Min TVL</span>
+      <select id="mintvl">
+        <option value="0">Any</option>
+        <option value="50000000">$50M</option>
+        <option value="100000000">$100M</option>
+        <option value="1000000000">$1B</option>
+      </select>
+    </label>
+  </section>
+
+  <section class="panel">
+    <div class="section-head">
+      <h2>The board</h2>
+      <p id="count" class="muted"></p>
+    </div>
+    <div class="table-wrap">
+      <table id="board">
+        <thead>
+          <tr>
+            <th class="num">#</th>
+            <th>Protocol</th>
+            <th>Category</th>
+            <th>Chains</th>
+            <th class="num">TVL</th>
+            <th class="num">7d</th>
+            <th class="num">Age</th>
+            <th class="num">Implied value</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div class="pager">
+      <button type="button" id="prev">&larr; Prev</button>
+      <span id="pageinfo" class="muted"></span>
+      <button type="button" id="next">Next &rarr;</button>
+    </div>
+    <p class="hint">Click a row to open its detail view and farm plan.</p>
+  </section>
+
+  <section class="panel detail" id="detail" hidden></section>
+
+  <section class="panel">
+    <div class="section-head">
+      <h2>Already trading</h2>
+      <p class="muted">Protocols whose token already trades, at the market&rsquo;s own value &mdash; kept apart from the ranked board.</p>
+    </div>
+    <div class="table-wrap">
+      <table id="live">
+        <thead>
+          <tr>
+            <th>Protocol</th>
+            <th>Category</th>
+            <th class="num">TVL</th>
+            <th class="num">Market cap</th>
+            <th class="num">Mcap / TVL</th>
+            <th class="num">7d</th>
+          </tr>
+        </thead>
+        <tbody id="liverows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel lab" id="lab">
+    <div class="section-head">
+      <h2>Model lab</h2>
+      <p class="muted">Move the constants and the board re-ranks live, with the same arithmetic the program runs. The submitted board uses the defaults.</p>
+    </div>
+    <div class="sliders">
+      <label>
+        <span>Growth weight <b id="gw-val">0.60</b></span>
+        <input id="gw" type="range" min="0" max="1.5" step="0.05" value="0.6">
+      </label>
+      <label>
+        <span>Maturity horizon, days <b id="mh-val">730</b></span>
+        <input id="mh" type="range" min="180" max="1825" step="5" value="730">
+      </label>
+      <label>
+        <span>Breadth per extra chain <b id="bs-val">0.03</b></span>
+        <input id="bs" type="range" min="0" max="0.06" step="0.005" value="0.03">
+      </label>
+    </div>
+    <p class="lab-state" id="lab-state">Defaults — this is the submitted board.</p>
+    <button type="button" id="lab-reset">Reset to defaults</button>
+  </section>
+
+  <footer class="panel foot">
+    <h2>How to read this radar</h2>
+    <p>A protocol is <b>pre-token</b> when its record carries no token: no market cap, no CoinGecko id, no symbol. That is what the record says, never proof it has no token. The watchlist is the 40 pre-token protocols at or above $50M TVL; the board ranks them all, plus the early finds below the floor. Wrapped, staked and bridged products of assets that already trade are set aside: their value is the underlying asset&rsquo;s, not a new token&rsquo;s.</p>
+    <p>Implied value = TVL &times; the category&rsquo;s peer multiple (the median market-cap/TVL of live-token protocols in the same category, or the global median where the category has no live peer) &times; a growth factor from the 7-day TVL change &times; a maturity factor from how long the protocol has run with no token &times; a breadth factor for the chains it runs on. No name is ever special-cased.</p>
+    <p class="muted">Farm plans are suggestions, not advice: a token may never be issued, and an airdrop may never come. Never pay anyone to claim for you, and only ever claim from the protocol&rsquo;s own site.</p>
+  </footer>
+</main>
+<script src="../data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
